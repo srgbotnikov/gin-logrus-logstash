@@ -1,0 +1,1 @@
+# gin-logrus-logstash
