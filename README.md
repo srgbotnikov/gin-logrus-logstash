@@ -1,6 +1,8 @@
 # gin-logrus-logstash
 
-```
+## Example
+
+```go
 package main
 
 import (
