@@ -28,6 +28,13 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 
 // Logger is the logrus logger handler
 func Logger(logger *logrus.Logger, connectionString, appName string) gin.HandlerFunc {
+	conn, err := net.Dial("udp", connectionString)
+	if err != nil {
+		log.Println(err)
+	}
+	hook := logrustash.New(conn, logrustash.DefaultFormatter(logrus.Fields{"type": appName}))
+
+	logger.Hooks.Add(hook)
 
 	return func(c *gin.Context) {
 		// other handler can change c.Path so:
@@ -51,14 +58,6 @@ func Logger(logger *logrus.Logger, connectionString, appName string) gin.Handler
 		if dataLength < 0 {
 			dataLength = 0
 		}
-
-		conn, err := net.Dial("tcp", connectionString)
-		if err != nil {
-			log.Println(err)
-		}
-		hook := logrustash.New(conn, logrustash.DefaultFormatter(logrus.Fields{"type": appName}))
-
-		logger.Hooks.Add(hook)
 
 		entry := logger.WithFields(logrus.Fields{
 			"statusCode": statusCode,
